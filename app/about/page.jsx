@@ -18,6 +18,7 @@ export default function AboutPage() {
                     position: 'relative',
                     overflow: 'hidden',
                     minHeight: '220px',
+                    backgroundColor: '#000',
                 }}
             >
                 <img

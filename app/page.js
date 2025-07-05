@@ -93,7 +93,7 @@ export default function HomePage() {
             ) : (
                 <main
                     style={{
-                        backgroundColor: '#1E1E1E',
+                        backgroundColor: '#000000',
                         minHeight: isMobile ? '96vh' : '94vh',
                         color: '#fff',
                         backgroundImage: `url(${backgroundImage})`,
