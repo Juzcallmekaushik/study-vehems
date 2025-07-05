@@ -116,7 +116,7 @@ export default function IGCSEPage() {
                     onChange={e => setSearchTerm(e.target.value)}
                 />
             </div>
-            <div style={{ margin: '1rem auto 0.5rem auto', maxWidth: 1200 }}>
+            <div style={{ margin: '-2.0rem auto 0.5rem auto', maxWidth: 1200 }}>
                 {filteredNotes.length === 0 ? (
                     <div
                         style={{
