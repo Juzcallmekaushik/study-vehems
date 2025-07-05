@@ -58,7 +58,7 @@ export default function HomePage() {
             {isPageLoading ? (
                 <div style={{
                     maxHeight: '94vh',
-                    backgroundColor: '#1E1E1E',
+                    backgroundColor: '##0a0a0a',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'

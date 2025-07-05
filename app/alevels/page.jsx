@@ -35,7 +35,7 @@ export default function AlevelsPage() {
             {isPageLoading ? (
                 <div style={{
                     maxHeight: '94vh',
-                    backgroundColor: '#1E1E1E',
+                    backgroundColor: '#0a0a0a',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'

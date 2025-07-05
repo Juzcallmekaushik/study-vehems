@@ -43,7 +43,7 @@ export default function PartnersPage() {
                     position: 'relative',
                     overflow: 'hidden',
                     minHeight: '220px',
-                    backgroundColor: '#000',
+                    backgroundColor: '##0a0a0a',
                 }}
             >
                 <img
