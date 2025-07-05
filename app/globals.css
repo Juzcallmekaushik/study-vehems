@@ -73,3 +73,9 @@ body {
 .font-custom {
   font-family: var(--font-jost);
 }
+
+/* Spinner animation for download button */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

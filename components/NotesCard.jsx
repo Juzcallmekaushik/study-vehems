@@ -1,9 +1,66 @@
 import React from "react";
 import { Eye } from "lucide-react";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 
 const NotesCard = ({ title, level, date, readTime, image, file }) => {
     const [isHovered, setIsHovered] = React.useState(false);
+    const [isDownloading, setIsDownloading] = React.useState(false);
+    const { data: session, status } = useSession();
+    const downloadTimeoutRef = React.useRef(null);
+
+    React.useEffect(() => {
+        if (session && typeof window !== 'undefined') {
+            const urlParams = new URLSearchParams(window.location.search);
+            const openFile = urlParams.get('openFile');
+            
+            if (openFile && decodeURIComponent(openFile) === file) {
+                if (downloadTimeoutRef.current) {
+                    clearTimeout(downloadTimeoutRef.current);
+                }
+                
+                setIsDownloading(true);
+                trackDownload(file).then(() => {
+                    window.open(file, "_blank");
+                    const newUrl = window.location.pathname;
+                    window.history.replaceState({}, document.title, newUrl);
+                }).finally(() => {
+                    setIsDownloading(false);
+                });
+            }
+        }
+    }, [session, file]);
+
+    React.useEffect(() => {
+        return () => {
+            if (downloadTimeoutRef.current) {
+                clearTimeout(downloadTimeoutRef.current);
+            }
+        };
+    }, []);
+
+    const trackDownload = async (filename) => {
+        try {
+            const response = await fetch('/api/downloads', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ filename })
+            });
+
+            if (response.status === 429) {
+                console.log('Rate limit exceeded - skipping duplicate download tracking');
+                return;
+            }
+
+            if (!response.ok) {
+                console.error('Failed to track download');
+            }
+        } catch (error) {
+            console.error('Error tracking download:', error);
+        }
+    };
+
     function timeAgo(dateString) {
         const now = new Date();
         const dateObj = new Date(dateString);
@@ -78,30 +135,66 @@ const NotesCard = ({ title, level, date, readTime, image, file }) => {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            cursor: "pointer",
+                            cursor: isDownloading ? " : "pointer",
                             transition: "all 0.2s ease",
                             boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+                            opacity: isDownloading ? 0.7 : 1,
                         }}
                         onMouseEnter={(e) => {
-                            e.target.style.background = "#ffffff";
-                            e.target.style.transform = "scale(1.1)";
+                            if (!isDownloading) {
+                                e.target.style.background = "#ffffff";
+                                e.target.style.transform = "scale(1.1)";
+                            }
                         }}
                         onMouseLeave={(e) => {
-                            e.target.style.background = "rgba(255, 255, 255, 0.9)";
-                            e.target.style.transform = "scale(1)";
+                            if (!isDownloading) {
+                                e.target.style.background = "rgba(255, 255, 255, 0.9)";
+                                e.target.style.transform = "scale(1)";
+                            }
                         }}
-                        onClick={(e) => {
-                            const session = sessionStorage.getItem("session");
+                        onClick={async (e) => {
+                            e.preventDefault();
+                            
+                            if (isDownloading) {
+                                return;
+                            }
+
+                            if (downloadTimeoutRef.current) {
+                                clearTimeout(downloadTimeoutRef.current);
+                            }
+                            
                             if (!session) {
                                 signIn('google', {
                                     callbackUrl: `${window.location.pathname}?openFile=${encodeURIComponent(file)}`
                                 });
                             } else {
-                                window.open(file, "_blank");
+                                setIsDownloading(true);
+                                
+                                downloadTimeoutRef.current = setTimeout(async () => {
+                                    try {
+                                        await trackDownload(file);
+                                        window.open(file, "_blank");
+                                    } finally {
+                                        setIsDownloading(false);
+                                    }
+                                }, 300);
                             }
                         }}
                     >
-                        <Eye size={20} color="#4B5842" />
+                        {isDownloading ? (
+                            <div 
+                                style={{
+                                    width: 20,
+                                    height: 20,
+                                    border: '2px solid #4B5842',
+                                    borderTop: '2px solid transparent',
+                                    borderRadius: '50%',
+                                    animation: 'spin 1s linear infinite'
+                                }}
+                            />
+                        ) : (
+                            <Eye size={20} color="#4B5842" />
+                        )}
                     </button>
                 </div>
             </div>
