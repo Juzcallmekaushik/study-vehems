@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { adventPro } from '../app/fonts';
-import { CircleUser, Bell, LogIn, Menu, X } from 'lucide-react'
+import { CircleUser, Bell, LogIn, Menu, X, LogOut } from 'lucide-react'
 import { useSession, signIn, signOut } from "next-auth/react";
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
@@ -504,11 +504,34 @@ const NavBar = () => {
 
                     <div style={{ marginTop: 'auto' }}>
                         {isLoggedIn ? (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '15px 0' }}>
-                                <CircleUser color="#BFDAA4" size={20} />
-                                <span className={`${adventPro.className}`} style={{ color: '#BFDAA4', fontSize: '14px' }}>
-                                    {session?.user?.name || 'User'}
-                                </span>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '15px 0' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <CircleUser color="#BFDAA4" size={20} />
+                                    <span className={`${adventPro.className}`} style={{ color: '#BFDAA4', fontSize: '14px' }}>
+                                        {session?.user?.name || 'User'}
+                                    </span>
+                                </div>
+                                <button
+                                    onClick={() => {
+                                        signOut();
+                                        setIsMobileMenuOpen(false);
+                                    }}
+                                    style={{
+                                        padding: '6px 12px',
+                                        color: '#BFDAA4',
+                                        border: 'none',
+                                        borderRadius: '6px',
+                                        fontSize: '12px',
+                                        fontWeight: '600',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'end',
+                                        gap: '4px',
+                                    }}
+                                    className={adventPro.className}
+                                >
+                                    <LogOut size={14} />
+                                </button>
                             </div>
                         ) : (
                             <button
