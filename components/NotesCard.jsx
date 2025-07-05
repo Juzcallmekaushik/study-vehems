@@ -5,7 +5,7 @@ import { signIn, useSession } from "next-auth/react";
 const NotesCard = ({ title, level, date, readTime, image, file }) => {
     const [isHovered, setIsHovered] = React.useState(false);
     const [isDownloading, setIsDownloading] = React.useState(false);
-    const { data: session, status } = useSession();
+    const { data: session } = useSession();
     const downloadTimeoutRef = React.useRef(null);
 
     React.useEffect(() => {
@@ -78,8 +78,8 @@ const NotesCard = ({ title, level, date, readTime, image, file }) => {
                 background: "transparent",
                 overflow: "hidden",
                 color: "#222",
-                maxWidth: window.innerWidth <= 768 ? 175 : 205,
-                maxHeight: window.innerWidth <= 768 ? 265 : 320,
+                maxWidth: typeof window !== "undefined" && window.innerWidth <= 768 ? 175 : 205,
+                maxHeight: typeof window !== "undefined" && window.innerWidth <= 768 ? 265 : 320,
                 width: "100%",
                 boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
                 fontFamily: "adventpro, sans-serif",
@@ -135,7 +135,7 @@ const NotesCard = ({ title, level, date, readTime, image, file }) => {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            cursor: isDownloading ? " : "pointer",
+                            cursor: isDownloading ? "not-allowed" : "pointer",
                             transition: "all 0.2s ease",
                             boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
                             opacity: isDownloading ? 0.7 : 1,
