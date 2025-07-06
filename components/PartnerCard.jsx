@@ -43,15 +43,16 @@ export default function PartnerCard({ imageUrl, title, description, websiteUrl }
                 @media (max-width: 600px) {
                     .partner-desktop-img {
                         display: none !important;
-                    }                .partner-content-box {
-                    margin: 0 1.2rem !important;
-                }
-                .partner-content-box p {
-                    margin: 0 0 1.2rem 0 !important;
-                }
-                .visit-website-btn {
-                    margin-top: auto;
-                }
+                    }
+                    .partner-content-box {
+                        margin: 0 1.2rem !important;
+                    }
+                    .partner-content-box p {
+                        margin: 0 0 1.2rem 0 !important;
+                    }
+                    .visit-website-btn {
+                        margin-top: auto;
+                    }
                 }
                 .partner-below-section {
                     display: flex;
