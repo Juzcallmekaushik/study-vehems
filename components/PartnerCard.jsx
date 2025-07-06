@@ -56,7 +56,7 @@ export default function PartnerCard({ imageUrl, title, description, websiteUrl }
                 }
                 .partner-below-section {
                     display: flex;
-                    align-items: flex-start;
+                    align-items: stretch;
                     margin: 2rem 0 0 0;
                     width: 100%;
                 }
@@ -85,7 +85,7 @@ export default function PartnerCard({ imageUrl, title, description, websiteUrl }
                     display: flex;
                     flex-direction: column;
                     justify-content: space-between;
-                    height: 100%;
+                    flex: 1;
                 }
                 .partner-content-box p {
                     font-family: 'adventPro', sans-serif;
@@ -106,6 +106,8 @@ export default function PartnerCard({ imageUrl, title, description, websiteUrl }
                     letter-spacing: 1px;
                     transition: all 0.3s ease;
                     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                    width: fit-content;
+                    align-self: flex-start;
                 }
                 .visit-website-btn:hover {
                     background-color: #b3ffb3;
