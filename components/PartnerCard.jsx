@@ -11,12 +11,14 @@ export default function PartnerCard({ imageUrl, title, description, websiteUrl }
                 className="partner-desktop-img"
             />
             <div className="partner-content-box">
-                <div className="partner-blatant-title" style={{ fontFamily: blatantBold.style.fontFamily }}>
-                    {title && title.toUpperCase()}
+                <div>
+                    <div className="partner-blatant-title" style={{ fontFamily: blatantBold.style.fontFamily }}>
+                        {title && title.toUpperCase()}
+                    </div>
+                    <p>
+                        {description}
+                    </p>
                 </div>
-                <p>
-                    {description}
-                </p>
                 {websiteUrl && (
                     <button 
                         className="visit-website-btn"
@@ -41,16 +43,15 @@ export default function PartnerCard({ imageUrl, title, description, websiteUrl }
                 @media (max-width: 600px) {
                     .partner-desktop-img {
                         display: none !important;
-                    }
-                    .partner-content-box {
-                        margin: 0 1.2rem !important;
-                    }
-                    .partner-content-box p {
-                        margin: 0 0 1.2rem 0 !important;
-                    }
-                    .visit-website-btn {
-                        margin-top: 0.5rem;
-                    }
+                    }                .partner-content-box {
+                    margin: 0 1.2rem !important;
+                }
+                .partner-content-box p {
+                    margin: 0 0 1.2rem 0 !important;
+                }
+                .visit-website-btn {
+                    margin-top: auto;
+                }
                 }
                 .partner-below-section {
                     display: flex;
@@ -78,6 +79,12 @@ export default function PartnerCard({ imageUrl, title, description, websiteUrl }
                     margin-bottom: 0.5rem;
                     letter-spacing: 2px;
                     display: block;
+                }
+                .partner-content-box {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    height: 100%;
                 }
                 .partner-content-box p {
                     font-family: 'adventPro', sans-serif;
