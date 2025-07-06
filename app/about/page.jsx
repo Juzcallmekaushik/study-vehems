@@ -149,6 +149,7 @@ export default function AboutPage() {
                     font-family: 'adventPro', sans-serif;
                     margin: 0 1.5rem 1.2rem 0;
                     line-height: 1.2;
+                    letter-spacing: 0.7px;
                 }
             `}</style>
         </>
