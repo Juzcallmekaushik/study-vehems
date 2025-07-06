@@ -12,7 +12,9 @@ const handler = NextAuth({
   callbacks: {
     async signIn({ user, account, profile }) {
       try {
+        console.log('Attempting to create Supabase client...')
         const supabase = createServerSupabaseClient()
+        console.log('Supabase client created successfully')
         
         const { data: existingUser, error: fetchError } = await supabase
           .from('users')
