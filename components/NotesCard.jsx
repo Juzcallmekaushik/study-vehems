@@ -172,7 +172,7 @@ const NotesCard = ({ title, level, date, readTime, image, file }) => {
                                 
                                 downloadTimeoutRef.current = setTimeout(async () => {
                                     try {
-                                        await trackDownload(file);
+                                        await trackDownload(title);
                                         window.open(file, "_blank");
                                     } finally {
                                         setIsDownloading(false);
