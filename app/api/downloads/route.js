@@ -103,7 +103,7 @@ export async function POST(request) {
         .from('downloads')
         .insert({
           username: username,
-          filename: null,
+          email: session.user.email,
           downloads: 1
         })
     }
@@ -126,11 +126,24 @@ export async function POST(request) {
         .eq('filename', filename)
         .is('username', null)
     } else {
+      const { data: noteData, error: noteError } = await supabase
+        .from('notes')
+        .select('file_url')
+        .eq('filename', filename)
+        .single()
+
+      if (noteError || !noteData) {
+        return new Response(JSON.stringify({ error: 'File URL not found for this filename' }), {
+          status: 404,
+          headers: { 'Content-Type': 'application/json' }
+        })
+      }
+
       const { error: filenameInsertError } = await supabase
         .from('downloads')
         .insert({
-          username: null,
           filename: filename,
+          file_url: noteData.file_url,
           downloads: 1
         })
     }
