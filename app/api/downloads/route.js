@@ -22,11 +22,20 @@ const authOptions = {
   secret: process.env.NEXTAUTH_SECRET,
 }
 
+export async function GET() {
+  return new Response(JSON.stringify({ message: 'Download API is working' }), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' }
+  })
+}
+
 export async function POST(request) {
+  console.log('Download tracking POST request received')
   try {
     const session = await getServerSession(authOptions)
 
     if (!session || !session.user) {
+      console.log('Unauthorized access attempt')
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' }
@@ -34,8 +43,10 @@ export async function POST(request) {
     }
 
     const { filename } = await request.json()
+    console.log('Tracking download for filename:', filename)
     
     if (!filename) {
+      console.log('No filename provided in request')
       return new Response(JSON.stringify({ error: 'Filename is required' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
@@ -65,6 +76,7 @@ export async function POST(request) {
     }
 
     const supabase = createServerSupabaseClient()
+    console.log('Supabase client created successfully')
 
     const { data: userData, error: userError } = await supabase
       .from('users')
@@ -73,6 +85,7 @@ export async function POST(request) {
       .single()
 
     if (userError || !userData) {
+      console.error('User lookup failed:', userError)
       return new Response(JSON.stringify({ error: 'User not found' }), {
         status: 404,
         headers: { 'Content-Type': 'application/json' }
@@ -98,6 +111,14 @@ export async function POST(request) {
         .update({ downloads: usernameRecord.downloads + 1 })
         .eq('username', username)
         .is('filename', null)
+      
+      if (usernameUpdateError) {
+        console.error('Error updating username downloads:', usernameUpdateError)
+        return new Response(JSON.stringify({ error: 'Failed to update user download count' }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' }
+        })
+      }
     } else {
       const { error: usernameInsertError } = await supabase
         .from('downloads')
@@ -106,6 +127,14 @@ export async function POST(request) {
           email: session.user.email,
           downloads: 1
         })
+      
+      if (usernameInsertError) {
+        console.error('Error inserting username downloads:', usernameInsertError)
+        return new Response(JSON.stringify({ error: 'Failed to create user download record' }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' }
+        })
+      }
     }
 
     const { data: filenameRecord, error: filenameSelectError } = await supabase
@@ -125,6 +154,14 @@ export async function POST(request) {
         .update({ downloads: filenameRecord.downloads + 1 })
         .eq('filename', filename)
         .is('username', null)
+      
+      if (filenameUpdateError) {
+        console.error('Error updating filename downloads:', filenameUpdateError)
+        return new Response(JSON.stringify({ error: 'Failed to update file download count' }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' }
+        })
+      }
     } else {
       const { data: noteData, error: noteError } = await supabase
         .from('notes')
@@ -146,6 +183,14 @@ export async function POST(request) {
           file_url: noteData.file_url,
           downloads: 1
         })
+      
+      if (filenameInsertError) {
+        console.error('Error inserting filename downloads:', filenameInsertError)
+        return new Response(JSON.stringify({ error: 'Failed to create file download record' }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' }
+        })
+      }
     }
 
     return new Response(JSON.stringify({ success: true }), {
