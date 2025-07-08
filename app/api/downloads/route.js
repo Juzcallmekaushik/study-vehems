@@ -1,7 +1,7 @@
-import { createServerSupabaseClient } from '../../../lib/supabaseServer'
-import { getServerSession } from 'next-auth/next'
-import NextAuth from 'next-auth'
-import GoogleProvider from 'next-auth/providers/google'
+import { createServerSupabaseClient } from '../../../lib/supabaseServer';
+import { getServerSession } from 'next-auth/next';
+import NextAuth from 'next-auth';
+import GoogleProvider from 'next-auth/providers/google';
 
 const downloadCache = new Map();
 const RATE_LIMIT_WINDOW = 5000;
@@ -20,7 +20,7 @@ const authOptions = {
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
-}
+};
 
 export async function GET() {
   return new Response(JSON.stringify({ message: 'Download API is working' }), {
@@ -30,12 +30,10 @@ export async function GET() {
 }
 
 export async function POST(request) {
-  console.log('Download tracking POST request received')
   try {
     const session = await getServerSession(authOptions)
 
     if (!session || !session.user) {
-      console.log('Unauthorized access attempt')
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' }
@@ -43,10 +41,8 @@ export async function POST(request) {
     }
 
     const { filename } = await request.json()
-    console.log('Tracking download for filename:', filename)
     
     if (!filename) {
-      console.log('No filename provided in request')
       return new Response(JSON.stringify({ error: 'Filename is required' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
@@ -76,7 +72,6 @@ export async function POST(request) {
     }
 
     const supabase = createServerSupabaseClient()
-    console.log('Supabase client created successfully')
 
     const { data: userData, error: userError } = await supabase
       .from('users')
@@ -84,15 +79,47 @@ export async function POST(request) {
       .eq('email', session.user.email)
       .single()
 
-    if (userError || !userData) {
-      console.error('User lookup failed:', userError)
-      return new Response(JSON.stringify({ error: 'User not found' }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json' }
-      })
-    }
+    let username;
 
-    const username = userData.username
+    if (userError || !userData) {      
+      if (userError?.code === 'PGRST116') {
+        const defaultUsername = session.user.email.split('@')[0]
+        
+        const { data: newUser, error: createError } = await supabase
+          .from('users')
+          .insert({
+            email: session.user.email,
+            username: defaultUsername,
+            name: session.user.name || defaultUsername
+          })
+          .select('username')
+          .single()
+        
+        if (createError) {
+          console.error('Failed to create new user:', createError)
+          return new Response(JSON.stringify({ 
+            error: 'Failed to create user record',
+            details: createError.message
+          }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' }
+          })
+        }
+        
+        username = newUser.username
+      } else {
+        console.error('Database error during user lookup:', userError)
+        return new Response(JSON.stringify({ 
+          error: 'Database error during user lookup',
+          details: userError?.message || 'Unknown error'
+        }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' }
+        })
+      }
+    } else {
+      username = userData.username
+    }
 
     const { data: usernameRecord, error: usernameSelectError } = await supabase
       .from('downloads')
@@ -166,11 +193,26 @@ export async function POST(request) {
       const { data: noteData, error: noteError } = await supabase
         .from('notes')
         .select('file_url')
-        .eq('filename', filename)
+        .eq('title', filename)
         .single()
 
       if (noteError || !noteData) {
-        return new Response(JSON.stringify({ error: 'File URL not found for this filename' }), {
+        console.error('File not found in notes table:', noteError)
+        
+        const { data: similarFiles, error: searchError } = await supabase
+          .from('notes')
+          .select('filename')
+          .ilike('filename', `%${filename.split(' ').slice(0, 3).join(' ')}%`)
+          .limit(5)
+        
+        if (!searchError && similarFiles?.length > 0) {
+        }
+        
+        return new Response(JSON.stringify({ 
+          error: 'File URL not found for this filename',
+          filename: filename,
+          suggestion: 'Please check if the filename exists in the notes database'
+        }), {
           status: 404,
           headers: { 'Content-Type': 'application/json' }
         })
