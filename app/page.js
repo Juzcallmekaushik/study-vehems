@@ -5,7 +5,7 @@ import { useSession, signIn } from "next-auth/react";
 import Image from 'next/image';
 
 export default function HomePage() {
-    const backgroundImage = '../wallpapers/homepage.jpg';
+    const backgroundImage = '../wallpapers/homepage.png';
     const [isMobile, setIsMobile] = useState(false);
     const [isPageLoading, setIsPageLoading] = useState(true);
 
