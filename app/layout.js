@@ -8,8 +8,8 @@ import {
 } from "./fonts";
 import "./globals.css";
 import { Providers } from './providers';
-import { SpeedInsights } from "@vercel/speed-insights/next"
-import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/react";
 
 export const metadata = {
   title: "Vehems Study Loft",
