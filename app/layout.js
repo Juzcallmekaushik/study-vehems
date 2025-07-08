@@ -8,6 +8,8 @@ import {
 } from "./fonts";
 import "./globals.css";
 import { Providers } from './providers';
+import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Analytics } from "@vercel/analytics/next"
 
 export const metadata = {
   title: "Vehems Study Loft",
@@ -22,6 +24,8 @@ export default function RootLayout({ children }) {
         style={{ backgroundColor: '#0a0a0a', color: '#ededed' }}
       >
         <Providers>{children}</Providers>
+        <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );
